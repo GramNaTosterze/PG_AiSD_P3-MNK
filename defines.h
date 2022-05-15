@@ -5,8 +5,9 @@ enum Player {
     SECOND = 2
 };
 enum State {
+    SECOND_PLAYER_WON = -1,
     RUNNING = 0,
-    PLAYER_WON = 1,
+    FIRST_PLAYER_WON = 1,
     TIE = 2
 };
 struct Pos {

@@ -4,7 +4,11 @@
 #include "MNK.h"
 
 int main() {
-    MNKSolver solver(3,3,3);
-    solver.genMoves();
-    return 0;
+  int n,m,k;
+  Player activePlayer;
+  char cmd[33];
+  scanf("%32s %i %i %i %i",cmd,&n,&m,&k,&activePlayer);
+  MNKSolver solver(cmd,n,m,k,activePlayer);
+  solver.print();
+  return 0;
 }

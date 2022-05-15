@@ -10,9 +10,9 @@ Player** copyArr(Player** arr, int x, int y) {
             cpy[i][j] = arr[i][j];
     return cpy;
 }
-
+Game::Game() {}
 Game::Game(Game& other): m(other.getM()), n(other.getM()), k(other.getK()), board(copyArr(other.board,m,n)), possibleMoves(other.possibleMoves), activePlayer(other.activePlayer){}
-Game::Game(int m, int n, int k): m(m),n(n),k(k),board(new Player*[n]),possibleMoves(n*k){
+Game::Game(int m, int n, int k, Player activePlayer): m(m),n(n),k(k),board(new Player*[n]),possibleMoves(n*k), activePlayer(activePlayer){
     for(int i = 0; i < n; i++)
         board[i] = new Player[m];
     for(int i = 0; i < n; i++)
@@ -22,19 +22,21 @@ Game::Game(int m, int n, int k): m(m),n(n),k(k),board(new Player*[n]),possibleMo
 void Game::scan() {
     for(int i = 0; i < n; i++)
         for(int j = 0; j < m; j++) {
-            scanf("%i",&board[i][j]);
+	  scanf("%i",&board[i][j]);
             if(board[i][j] != 0)
                 possibleMoves--;
         }
 }
-void Game::print() {
+char* Game::print() {
+    char *prt = new char[3*n*m];
+    sprintf(prt,"");
     for(int i = 0; i < n; i++) {
         for(int j = 0; j < m; j++) {
-            printf("%i ",board[i][j]);
-            changePlayer();
+	  sprintf(prt,"%s %i",prt,board[i][j]);
         }
-        printf("\n");
+        sprintf(prt,"%s\n",prt);
     }
+    return prt;
 }
 bool Game::conVertical(int I, int J) {
     if(I+k > n)
@@ -66,12 +68,9 @@ bool Game::winingConditions(int I, int J) {
 State Game::state() {
     for(int i = 0; i < n; i++)
         for(int j = 0; j < m; j++)
-            if(board[i][j] == activePlayer) {
-                if(winingConditions(i,j)) {
-                    printf("Player %i won\n",activePlayer);
-                    return PLAYER_WON;
-                }
-            }
+            if(board[i][j] == activePlayer)
+	      if(winingConditions(i,j))
+                  return activePlayer == FIRST ? FIRST_PLAYER_WON : SECOND_PLAYER_WON;
     return RUNNING;
 }
 State Game::place(Pos pos) {
@@ -81,19 +80,20 @@ State Game::place(Pos pos) {
     }
     board[pos.x][pos.y] = activePlayer;
     State toReturn = state();
-    changePlayer();
+    activePlayer = changePlayer();
     possibleMoves--;
     return toReturn;
 }
-void Game::changePlayer() { activePlayer = activePlayer==FIRST ? SECOND : FIRST; }
+Player Game::changePlayer() { return activePlayer==FIRST ? SECOND : FIRST; }
 Player Game::operator[](Pos pos) { return board[pos.x][pos.y]; }
 int Game::getM() const{ return m; }
 int Game::getN() const{ return n; }
 int Game::getK() const{ return k; }
-
+Player Game::getPlayer() const { return activePlayer; }
+int Game::getPMoves() const { return possibleMoves; }
 Game::~Game() {
     for(int i = 0; i < n; i++)
         delete board[i];
-    delete board;
+    delete[] board;
     board = nullptr;
 }
